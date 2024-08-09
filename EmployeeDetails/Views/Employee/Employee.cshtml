@@ -100,29 +100,29 @@
 
     <form asp-action="Create" method="post">
         <label for="firstName">First Name:</label>
-        <input type="text" id="firstName" name="FirstName" required>
+        <input type="text" id="firstName" name="FirstName" required maxlength="50">
 
         <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName" name="LastName">
+        <input type="text" id="lastName" name="LastName" maxlength="50">
 
         <label for="email">Email:</label>
-        <input type="email" id="email" name="Email" required>
+        <input type="email" id="email" name="Email" required maxlength="50">
 
         <label for="address">Address:</label>
-        <textarea id="address" name="Address" rows="4" required></textarea>
+        <textarea id="address" name="Address" rows="4" required maxlength="50"></textarea>
 
         <label for="city">City:</label>
-        <input type="text" id="city" name="City" required>
+        <input type="text" id="city" name="City" required maxlength="50">
 
         <label for="designation">Designation:</label>
-        <input type="text" id="designation" name="Designation" required>
+        <input type="text" id="designation" name="Designation" required maxlength="50">
 
         <h2>Project Details</h2>
         <label for="projectName">Project Name:</label>
-        <input type="text" id="projectName" name="Project.ProjectName" required />
+        <input type="text" id="projectName" name="Project.ProjectName" required maxlength="50" />
 
         <label for="projectManagerName">Project Manager Name:</label>
-        <input type="text" id="projectManagerName" name="Project.ProjectManagerName" required />
+        <input type="text" id="projectManagerName" name="Project.ProjectManagerName" required maxlength="50" />
 
         <input type="submit" value="Submit">
     </form>
