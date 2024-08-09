@@ -103,7 +103,7 @@
         <input type="text" id="firstName" name="FirstName" required>
 
         <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName" name="LastName" required>
+        <input type="text" id="lastName" name="LastName">
 
         <label for="email">Email:</label>
         <input type="email" id="email" name="Email" required>
@@ -129,6 +129,12 @@
 
     <div class="table-container">
         <h2>Employee List</h2>
+         @if (!Model.Any())
+        {
+            <div class="no-data">No data found</div>
+        }
+        else
+        {
         <table>
             <thead>
                 <tr>
@@ -167,6 +173,7 @@
                 }
             </tbody>
         </table>
+        }
     </div>
 </body>
 </html>

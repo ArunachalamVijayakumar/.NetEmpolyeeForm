@@ -1,14 +1,17 @@
 using EmployeeDetails.Models;
 using EmployeeDetails.Repository;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EmployeeDetails.Controllers
 {
-    public class EmployeeController : Controller
+    public class EmployeeController : BaseController
     {
         private readonly IEmpolyeeRepository _repository;
 
-        public EmployeeController(IEmpolyeeRepository repository)
+        public EmployeeController(IEmpolyeeRepository repository) : base(employeeRepository:repository) 
         {
             _repository = repository;
         }
@@ -29,8 +32,7 @@ namespace EmployeeDetails.Controllers
         [HttpGet]
         public IActionResult Employee()
         {
-            var employees = _repository.GetAll();
-            return View("Employee", employees);
+            return RedirectToEmployeeListIfAuthenticated();
         }
 
         [HttpPost]
@@ -38,11 +40,12 @@ namespace EmployeeDetails.Controllers
         {
             _repository.deleteEmpolyee(id);
             var employees = _repository.GetAll();
-            return View("Employee", employees); // Redirect to the action that lists the employees
+            return View("Employee", employees);
         }
 
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Login");
         }
     }
