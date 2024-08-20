@@ -3,18 +3,24 @@ using EmployeeDetails.Repository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace EmployeeDetails.Controllers
 {
     public class LoginController : BaseController
     {
         private readonly IUserRepository _userRepository;
+        private readonly IConfiguration _configuration;
 
-        public LoginController(IUserRepository userRepository)
+        public LoginController(IUserRepository userRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
+            _configuration = configuration;
         }
+        [HttpGet]
         public IActionResult Login()
         {
             ClaimsPrincipal claimUser = HttpContext.User;
@@ -29,26 +35,43 @@ namespace EmployeeDetails.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginModel loginModel)
         {
-            if(_userRepository.ValidateUser(loginModel.Username, loginModel.Password))
+            if (_userRepository.ValidateUser(loginModel.Username, loginModel.Password))
             {
-                List<Claim> claims = new List<Claim>() { new Claim(ClaimTypes.NameIdentifier,loginModel.Username),
-                new Claim("Other properties", "Example Role")};
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, loginModel.Username),
+            new Claim(ClaimTypes.Role, "ExampleRole")
+        };
 
-                ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                AuthenticationProperties properties = new AuthenticationProperties()
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    claims: claims,
+                    expires: DateTime.Now.AddMinutes(5),
+                    signingCredentials: creds);
+
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+                // Set the JWT token in a cookie
+                HttpContext.Response.Cookies.Append("JwtToken", tokenString, new CookieOptions
                 {
-                    AllowRefresh = true,
-                    IsPersistent = loginModel.keepLoggedIn,
-                };
+                    HttpOnly = true,
+                    Secure = true,
+                    Expires = DateTimeOffset.Now.AddMinutes(5)
+                });
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,new ClaimsPrincipal(identity),properties);
+                Console.WriteLine($"Token: {tokenString}");
 
+                // Redirect to Employee action without passing token
                 return RedirectToAction("Employee", "Employee");
-            };
+            }
 
             ViewData["Validate Message"] = "User not found";
             return View();
         }
+
     }
 }

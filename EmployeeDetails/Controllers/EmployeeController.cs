@@ -2,11 +2,14 @@ using EmployeeDetails.Models;
 using EmployeeDetails.Repository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text;
 
 namespace EmployeeDetails.Controllers
 {
+    [Authorize]
     public class EmployeeController : BaseController
     {
         private readonly IEmpolyeeRepository _repository;
@@ -32,7 +35,13 @@ namespace EmployeeDetails.Controllers
         [HttpGet]
         public IActionResult Employee()
         {
-            return RedirectToEmployeeListIfAuthenticated();
+            if (IsUserAuthenticated())
+            {
+                var employees = _repository.GetAll();
+                return View("Employee", employees);
+            }
+
+            return RedirectToAction("Login", "Login");
         }
 
         [HttpPost]
@@ -43,9 +52,38 @@ namespace EmployeeDetails.Controllers
             return View("Employee", employees);
         }
 
+        public IActionResult Export()
+        {
+            var employees = _repository.GetAll();
+
+            if (!employees.Any())
+            {
+                TempData["NoDataMessage"] = "No employee data available to export.";
+                return View("Employee",employees); 
+            }
+            else
+            {
+                var csvBuilder = new StringBuilder();
+                csvBuilder.AppendLine("EmployeeID,FirstName,LastName,Email,Address,City,Designation,ProjectName,ProjectManagerName");
+
+                foreach (var employee in employees)
+                {
+                    csvBuilder.AppendLine($"{employee.EmployeeID},{employee.FirstName},{employee.LastName},{employee.email},{employee.address},{employee.city},{employee.designation},{employee.Project?.ProjectName},{employee.Project?.ProjectManagerName}");
+                }
+
+                var csvBytes = Encoding.UTF8.GetBytes(csvBuilder.ToString());
+                var result = new FileContentResult(csvBytes, "text/csv")
+                {
+                    FileDownloadName = "employees.csv",
+                };
+
+                return result;
+            }
+        }
+
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Response.Cookies.Delete("JwtToken");
             return RedirectToAction("Login", "Login");
         }
     }

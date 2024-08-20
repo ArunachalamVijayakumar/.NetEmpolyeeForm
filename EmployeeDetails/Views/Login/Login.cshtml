@@ -88,6 +88,12 @@
                 <button type="submit">Login</button>
             </div>
 
+            <div>
+                <a href="@Url.Action("SignUp", "Account")">
+                    <button type="button" class="signup-button">Sign Up</button>
+                </a>
+            </div>
+
             @if (ViewData["Validate Message"] != null)
             {
                 <br />

@@ -260,3 +260,4 @@ C:\Users\arunachalam.vijayaku\source\repos\EmployeeDetails\EmployeeDetails\obj\D
 C:\Users\arunachalam.vijayaku\source\repos\EmployeeDetails\EmployeeDetails\obj\Debug\net8.0\ref\EmployeeDetails.dll
 C:\Users\arunachalam.vijayaku\source\repos\EmployeeDetails\EmployeeDetails\bin\Debug\net8.0\Dapper.dll
 C:\Users\arunachalam.vijayaku\source\repos\EmployeeDetails\EmployeeDetails\obj\Debug\net8.0\EmployeeDetails.sourcelink.json
+C:\Users\arunachalam.vijayaku\source\repos\EmployeeDetails\EmployeeDetails\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

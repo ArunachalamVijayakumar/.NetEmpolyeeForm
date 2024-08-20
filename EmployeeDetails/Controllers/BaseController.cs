@@ -8,6 +8,7 @@ namespace EmployeeDetails.Controllers
     public class BaseController : Controller
     {
         protected readonly IEmpolyeeRepository _employeeRepository;
+     
 
         // Constructor for both repositories
         public BaseController(IEmpolyeeRepository employeeRepository = null)
@@ -19,17 +20,6 @@ namespace EmployeeDetails.Controllers
         {
             ClaimsPrincipal claimUser = HttpContext.User;
             return claimUser.Identity.IsAuthenticated;
-        }
-
-        protected ActionResult RedirectToEmployeeListIfAuthenticated()
-        {
-            if (IsUserAuthenticated() && _employeeRepository != null)
-            {
-                var employees = _employeeRepository.GetAll();
-                return View("Employee", employees);
-            }
-
-            return RedirectToAction("Login", "Login");
         }
     }
 }
